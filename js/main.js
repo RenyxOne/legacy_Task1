@@ -7,10 +7,57 @@ $(document).ready(function(){
             return false;
         }
         Get_scores();
+        Get_results();
+        $('#results').modal('show');
         return false;
     });
+
+    setStudentList(studentListValues);
 });
 
+var studentListValues = [
+    {
+        studentClass: 1,
+        studentNumber: 1,
+        studentName: 'one'
+    },
+    {
+        studentClass: 2,
+        studentNumber: 2,
+        studentName: 'two'
+    },
+    {
+        studentClass: 3,
+        studentNumber: 3,
+        studentName: 'three'
+    },
+    {
+        studentClass: 4,
+        studentNumber: 4,
+        studentName: 'four'
+    },
+    {
+        studentClass: 5,
+        studentNumber: 5,
+        studentName: 'five'
+    }
+];
+
+function setStudentList(list){
+    _.forEach(list, function (item) {
+        var listItem = $('<option></option>').text(item.studentName);
+
+        $('#studentList').append(listItem);
+    });
+
+    $('#studentList').change(function () {
+        var selectedStudent = list[$('#studentList')[0].selectedIndex - 1];
+
+        $('#studentClass').val(selectedStudent.studentClass);
+        $('#studentNumber').val(selectedStudent.studentNumber);
+        $('#studentName').val(selectedStudent.studentName);
+    });
+}
 
 function inputsInformation(inputs) {
     var text = '';
@@ -33,17 +80,17 @@ function hasEmptyRequiredInput(){
     var requiredInputs = [
         {
             id: 'studentClass',
-            text: '班级',
+            text: 'Class',
             divId: 'class'
         },
         {
             id: 'studentNumber',
-            text: '学号',
+            text: 'Student ID',
             divId: 'number'
         },
         {
             id: 'studentName',
-            text: '姓名',
+            text: 'Name',
             divId: 'name'
         }
     ];
@@ -58,15 +105,38 @@ function hasEmptyRequiredInput(){
 
 function Get_scores() {
 
-    var value = fullInTopics() + choiceTopics() + multipleChoiceTopics() + trueOrFalseTopics() + shortAnswerTopics();
+    var value = fullInTopics() + choiceTopics() + multipleChoiceTopics() + trueOrFalseTopics() + shortAnswerTopics()
+      + extraAnswerTopics();
     $("#scores").text(value);
     $('#divScores').addClass('text-danger');
 
 }
 
+function Get_results() {
+
+    var value = fullInTopics() + choiceTopics() + multipleChoiceTopics() + trueOrFalseTopics() + shortAnswerTopics()
+      + extraAnswerTopics();
+
+    $("#resultScore").text(value);
+
+    if (value >= 85) {
+        $('#resultGrade').text(5);
+    }
+    else if (value >= 70) {
+        $('#resultGrade').text(4);
+    }
+    else if (value >= 40) {
+        $('#resultGrade').text(3);
+    }
+    else {
+        $('#resultGrade').text(2);
+    }
+
+}
+
 function fullInTopics() {
-    var fullInSubject1 = new Subject('fullInSubject', ['统一建模语言'], 1, 5);
-    var fullInSubject2 = new Subject('fullInSubject', ['继承性', '多态性', '封装性'], 3, 5);
+    var fullInSubject1 = new Subject('fullInSubject', ['Unified Modeling Language'], 1, 5);
+    var fullInSubject2 = new Subject('fullInSubject', ['inheritance', 'polymorphism', 'encapsulation'], 3, 5);
 
     var value1_1_1 = $('#gap1').val();
 
@@ -77,7 +147,7 @@ function fullInTopics() {
     var value1_2 = [];
     value1_2.push($('#gap2_1').val());
     value1_2.push($('#gap2_2').val());
-    value1_2.push($('gap2_3').val());
+    value1_2.push($('#gap2_3').val());
 
     for (var i = 0; i < fullInSubject2.answer.length; i++) {
         for (var j = 0; j < value1_2.length; j++) {
@@ -154,12 +224,24 @@ function trueOrFalseTopics() {
 
 function shortAnswerTopics() {
     var shortAnswerSubject = new Subject('shortAnswerSubject',
-        ['模型是对现实世界的简化和抽象,模型是对所研究的系统、过程、事物或概念的一种表达形式。可以是物理实体;可以是某种图形;或者是一种数学表达式。'],
-        1, 20);
+      ['A model is a simplification and abstraction of the real world, and a model is a form of expression for the system, process, thing or concept under study. It can be a physical entity; it can be some kind of graphic; or it can be a mathematical expression.'],
+      1, 20);
     var value5 = $('#short5').val();
 
     if (value5 == shortAnswerSubject.answer[0]) {
         shortAnswerSubject.scores = shortAnswerSubject.scorePerSubject;
     }
     return shortAnswerSubject.scores;
+}
+
+function extraAnswerTopics() {
+    var extraAnswerSubject = new Subject('extraAnswerSubject',
+      ['test'],
+      1, 10);
+    var value1 = $('#extra1').val();
+
+    if (value1 == extraAnswerSubject.answer[0]) {
+        extraAnswerSubject.scores = extraAnswerSubject.scorePerSubject;
+    }
+    return extraAnswerSubject.scores;
 }
